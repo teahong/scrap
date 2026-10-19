@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>시트에 스크랩</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>시트에 스크랩</h1>
+      <a id="pageTitle" class="page" target="_blank"></a>
+    </header>
+
+    <label for="text">문구</label>
+    <textarea id="text" rows="6"></textarea>
+
+    <label for="tags">태그 <span class="hint">쉼표로 여러 개 입력</span></label>
+    <input id="tags" type="text" placeholder="예: 마케팅, 아이디어" autocomplete="off">
+    <div id="suggestions" class="chips"></div>
+
+    <label for="memo">메모</label>
+    <textarea id="memo" rows="3" placeholder="선택 사항"></textarea>
+
+    <footer>
+      <p id="status" role="status"></p>
+      <button id="cancel" type="button" class="secondary">취소</button>
+      <button id="save" type="button">저장 <kbd>Ctrl+Enter</kbd></button>
+    </footer>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
