@@ -1,12 +1,20 @@
 const MENU_ID = 'scrap-to-sheet';
+const IMAGE_MENU_ID = 'scrap-image-to-sheet';
 const POPUP_WIDTH = 440;
-const POPUP_HEIGHT = 560;
+const POPUP_HEIGHT = 600;
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: MENU_ID,
-    title: '시트에 스크랩',
-    contexts: ['selection'],
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: MENU_ID,
+      title: '시트에 스크랩',
+      contexts: ['selection'],
+    });
+    chrome.contextMenus.create({
+      id: IMAGE_MENU_ID,
+      title: '이미지를 시트에 스크랩',
+      contexts: ['image'],
+    });
   });
   updateBadge();
 });
@@ -20,13 +28,19 @@ chrome.runtime.onStartup.addListener(() => {
 chrome.action.onClicked.addListener(() => chrome.runtime.openOptionsPage());
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId !== MENU_ID) return;
+  let pending;
+  if (info.menuItemId === MENU_ID) {
+    pending = { type: 'text', text: await readSelection(info, tab) };
+  } else if (info.menuItemId === IMAGE_MENU_ID) {
+    pending = { type: 'image', imageUrl: info.srcUrl || '', text: await readImageAlt(info, tab) };
+  } else {
+    return;
+  }
 
-  const text = await readSelection(info, tab);
   const id = String(Date.now());
   await chrome.storage.session.set({
     [`pending_${id}`]: {
-      text,
+      ...pending,
       title: tab?.title || '',
       url: info.pageUrl || tab?.url || '',
     },
@@ -65,6 +79,24 @@ async function readSelection(info, tab) {
   } catch (_) {
     // PDF 뷰어, 크롬 내부 페이지처럼 스크립트를 실행할 수 없는 곳
     return fallback;
+  }
+}
+
+// 우클릭한 이미지의 alt(없으면 title) 텍스트를 설명 기본값으로 가져옵니다.
+async function readImageAlt(info, tab) {
+  if (tab?.id == null || tab.id < 0 || !info.srcUrl) return '';
+  try {
+    const [res] = await chrome.scripting.executeScript({
+      target: { tabId: tab.id, frameIds: [info.frameId ?? 0] },
+      args: [info.srcUrl],
+      func: (src) => {
+        const img = [...document.images].find((el) => el.currentSrc === src || el.src === src);
+        return img ? (img.alt || img.title || '').trim() : '';
+      },
+    });
+    return res?.result || '';
+  } catch (_) {
+    return '';
   }
 }
 

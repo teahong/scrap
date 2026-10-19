@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "시트 스크랩",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "웹페이지에서 선택한 문구를 태그·메모와 함께 구글 스프레드시트에 저장합니다.",
   "permissions": ["contextMenus", "storage", "scripting", "activeTab"],
   "host_permissions": [

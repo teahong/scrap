@@ -8,11 +8,16 @@
 <body>
   <main>
     <header>
-      <h1>시트에 스크랩</h1>
+      <h1 id="heading">시트에 스크랩</h1>
       <a id="pageTitle" class="page" target="_blank"></a>
     </header>
 
-    <label for="text">문구</label>
+    <figure id="imageBox" class="image-box" hidden>
+      <img id="imagePreview" alt="">
+      <figcaption id="imageNote"></figcaption>
+    </figure>
+
+    <label for="text" id="textLabel">문구</label>
     <textarea id="text" rows="6"></textarea>
 
     <label for="tags">태그 <span class="hint">쉼표로 여러 개 입력</span></label>

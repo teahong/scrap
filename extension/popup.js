@@ -15,6 +15,7 @@ async function init() {
   }
 
   $('text').value = pending.text;
+  if (pending.type === 'image') showImage(pending.imageUrl);
   $('pageTitle').textContent = pending.title || pending.url;
   $('pageTitle').href = pending.url;
   $('pageTitle').title = pending.url;
@@ -31,6 +32,31 @@ async function init() {
   });
 
   $('tags').focus();
+}
+
+function showImage(imageUrl) {
+  $('heading').textContent = '이미지를 시트에 스크랩';
+  $('textLabel').textContent = '설명';
+  $('text').rows = 2;
+  $('text').placeholder = '선택 사항';
+  $('imageBox').hidden = false;
+
+  // data:, blob: 이미지는 페이지 밖에서는 열 수 없어 URL로 남길 수 없습니다.
+  if (!/^https?:\/\//i.test(imageUrl)) {
+    $('imageNote').textContent = '이 이미지는 웹 주소(URL)가 없어 저장할 수 없습니다.';
+    $('imageNote').className = 'error';
+    $('save').disabled = true;
+    return;
+  }
+
+  $('imageNote').textContent = imageUrl;
+  $('imageNote').title = imageUrl;
+  $('imagePreview').src = imageUrl;
+  $('imagePreview').addEventListener('error', () => {
+    $('imagePreview').hidden = true;
+    $('imageNote').textContent = '미리보기를 불러오지 못했습니다. 저장은 할 수 있지만 시트 썸네일도 안 보일 수 있습니다.';
+    $('imageNote').className = 'error';
+  });
 }
 
 function parseTags(value) {
@@ -72,8 +98,9 @@ function addTag(tag) {
 }
 
 async function save() {
+  const isImage = pending.type === 'image';
   const text = $('text').value.trim();
-  if (!text) {
+  if (!text && !isImage) {
     setStatus('문구를 입력해 주세요.', 'error');
     return;
   }
@@ -82,6 +109,8 @@ async function save() {
   setStatus('저장 중…');
 
   const item = {
+    type: isImage ? 'image' : 'text',
+    imageUrl: isImage ? pending.imageUrl : undefined,
     text,
     tags: parseTags($('tags').value),
     memo: $('memo').value.trim(),

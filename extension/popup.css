@@ -47,6 +47,33 @@ h1 {
 }
 .page:hover { text-decoration: underline; }
 
+.image-box {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--field);
+}
+.image-box[hidden] { display: none; }
+.image-box img {
+  max-width: 100%;
+  max-height: 160px;
+  object-fit: contain;
+}
+.image-box figcaption {
+  max-width: 100%;
+  color: var(--muted);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.image-box figcaption.error { color: var(--error); white-space: normal; }
+
 label {
   margin-top: 6px;
   font-weight: 600;
